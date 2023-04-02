@@ -1,8 +1,8 @@
 
-# Your name:
-# Your student id:
-# Your email:
-# List who you have worked with on this project:
+# Your name: Nikitha Subramaniam
+# Your student id: 08130731
+# Your email: nikithas@umich.edu
+# List who you have worked with on this project: N/A
 
 import unittest
 import sqlite3
