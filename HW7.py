@@ -53,7 +53,21 @@ def make_positions_table(data, cur, conn):
 #     created for you -- see make_positions_table above for details.
 
 def make_players_table(data, cur, conn):
-    pass
+    Positions = make_positions_table(data, cur, conn)
+
+    for player in data['squad']:
+        id = player['id']
+        name = player['name']
+        birthyear = player['dateOfBirth'].split('-')[0]
+        nationality = player['nationality']
+
+        cur.execute("SELECT id FROM Positions WHERE name=?", (player['position']))
+        position_id = cur.fetchone()[0]
+
+        cur.execute("INSERT INTO Players (id, name, position_id, birthyear, nationality) VALUES (?, ?, ?, ?, ?)", (id, name, position_id, birthyear, nationality))
+        conn.commit()
+
+
 
 ## [TASK 2]: 10 points
 # Finish the function nationality_search
@@ -66,7 +80,11 @@ def make_players_table(data, cur, conn):
         # the player's name, their position_id, and their nationality.
 
 def nationality_search(countries, cur, conn):
-    pass
+    query = "SELECT name, position_id, nationality FROM Players WHERE nationality IN ({})".format(', '.join(['?']*len(countries)))
+    cur.execute(query, countries)
+
+    results = cur.fetchall()
+    return results
 
 ## [TASK 3]: 10 points
 # finish the function birthyear_nationality_search
@@ -85,7 +103,13 @@ def nationality_search(countries, cur, conn):
 
 
 def birthyear_nationality_search(age, country, cur, conn):
-    pass
+    year = 2023 - age
+
+    query = "SELECT name, nationality, birthyear FROM Players WHERE birthyear<year"
+    cur.execute(query, (country, year))
+
+    results = cur.fetchall()
+    return results
 
 ## [TASK 4]: 15 points
 # finish the function position_birth_search
@@ -105,7 +129,15 @@ def birthyear_nationality_search(age, country, cur, conn):
     # HINT: You'll have to use JOIN for this task.
 
 def position_birth_search(position, age, cur, conn):
-       pass
+    byear = 2023 - age
+
+    query = "SELECT Players.name, Positions.position, Players.birthyear \
+        FROM Players JOIN Positions ON Players.position_id = Positions.id \
+        WHERE Positions.position=? AND Players.birthyear>=?"
+    cur.execute(query, (position, byear))
+
+    results = cur.fetchall()
+    return results
 
 
 # [EXTRA CREDIT]
